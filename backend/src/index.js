@@ -18,10 +18,15 @@ import routesBot from './routes/routesBot.js';
 import routesContacto from './routes/routesContacto.js';
 
 import cors from "cors";
+import 'dotenv/config';
+
+// FRONTEND_URL admite varias URLs separadas por coma (ej: https://airmobile.vercel.app,http://localhost:5173)
+const origenesPermitidos = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',').map(u => u.trim().replace(/\/$/, ''));
 
 const corsOptions = {
   // Aquí pones la URL exacta donde corre tu React
-  origin: ['http://localhost:5173', 'https://tu-dominio-final.com'], 
+  origin: origenesPermitidos,
   methods: ['GET', 'POST', 'PUT', 'DELETE','PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'], // Muy importante para que pasen tus JWT
   credentials: true // Permite el envío de cookies si las llegas a usar
@@ -30,7 +35,7 @@ const corsOptions = {
 
 
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const api = "/api";
 
 
@@ -60,9 +65,11 @@ app.use(`${api}/pagos`, routesPagos);
 
 app.use(`${api}/bot`, routesBot);
 
-app.get("", (req, res) => {
-    res.send("hola");
+app.get("/", (req, res) => {
+    res.send("API AirMobile funcionando");
 })
+
+app.get("/health", (req, res) => res.json({ ok: true }));
 
 
 app.listen(PORT, async () => {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useApi } from "../../../hooks/useApi";
 import Paginacion from "../../common/Paginacion";
+import { API_URL } from '../../../config';
 
 const HistorialFacturas = () => {
     const endpointFetch = "facturas/obtener-facturas-usuario";
@@ -51,7 +52,7 @@ const HistorialFacturas = () => {
         const token = localStorage.getItem('token');
 
         try {
-            const URL_BACKEND = 'http://localhost:3000/api';
+            const URL_BACKEND = API_URL;
             const response = await fetch(`${URL_BACKEND}/facturas/detalle-factura/${idFactura}/pdf`, {
                 method: 'GET',
                 headers: { Authorization: `Bearer ${token}` }

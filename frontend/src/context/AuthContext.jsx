@@ -1,11 +1,12 @@
 // src/context/AuthContext.jsx
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
+import { API_URL } from '../config';
 
 // 1. Creamos el Contexto (el megáfono)
 const AuthContext = createContext();
-const URL_PERFIL = "http://localhost:3000/api/usuarios/mi-perfil";
-const URL_LOGOUT = "http://localhost:3000/api/usuarios/logout";
+const URL_PERFIL = `${API_URL}/usuarios/mi-perfil`;
+const URL_LOGOUT = `${API_URL}/usuarios/logout`;
 // 2. Creamos el Proveedor (el componente que guarda el estado)
 export const AuthProvider = ({ children }) => {
     // Inicializamos el estado leyendo una sola vez el localStorage

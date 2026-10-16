@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApi } from '../../hooks/useApi';
 import { useAuth } from '../../context/AuthContext';
+import { API_URL } from '../../config';
 
 const ESTADOS = ['Pendiente', 'Completado', 'Enviado', 'Cancelado', 'Reembolsado'];
 
@@ -78,7 +79,7 @@ export const FilaFactura = ({ factura, onEstadoActualizado }) => {
         setDescargando(true);
         try {
             const response = await fetch(
-                `http://localhost:3000/api/facturas/detalle-factura/${factura.id}/pdf`,
+                `${API_URL}/facturas/detalle-factura/${factura.id}/pdf`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 

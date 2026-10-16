@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { N8N_WEBHOOK_URL } from "../config";
 
-const webhookUrl = "http://localhost:5678/webhook/dfff64e4-9189-477f-91c1-61a901a87dd6";
+const webhookUrl = N8N_WEBHOOK_URL;
 
 const getSessionData = (usuarioPerfil) => {
     if (usuarioPerfil && usuarioPerfil.id) {

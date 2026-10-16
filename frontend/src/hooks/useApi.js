@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { API_URL } from "../config";
 
 // 1. VARIABLE GLOBAL (Fuera del hook)
 // Actúa como un semáforo para que todas las peticiones concurrentes lo vean
@@ -8,7 +9,7 @@ let promesaRenovacion = null;
 export const useApi = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const urlBase = "http://localhost:3000/api/";
+    const urlBase = `${API_URL}/`;
 
     const { refreshToken, login, logout,setUsuario } = useAuth();
 

@@ -8,6 +8,10 @@ import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 import { enviarEmailCompra } from '../utils/mailer.js';
 import { ESTADOS } from '../utils/estados.js';
 
+// URL pública del frontend (primera de FRONTEND_URL) y del backend (para el webhook)
+const FRONTEND_URL = (process.env.FRONTEND_URL || "http://localhost:5173").split(",")[0].trim().replace(/\/$/, "");
+const BACKEND_URL = (process.env.BACKEND_URL || "").replace(/\/$/, "");
+
 console.log("Token cargado:", process.env.MP_ACCESS_TOKEN ? "SÍ" : "NO");
 
 const client = new MercadoPagoConfig({
@@ -86,11 +90,11 @@ export const crearPreferencia = async (req, res) => {
             body: {
                 items: itemsMercadoPago,
                 external_reference: userId.toString(),
-                notification_url: "https://estrogen-spry-brunette.ngrok-free.dev/api/pagos/webhook",
+                ...(BACKEND_URL && { notification_url: `${BACKEND_URL}/api/pagos/webhook` }),
                 back_urls: {
-                    success: "localhost:5173/pago-exitoso",
-                    failure: "localhost:5173/pago-fallido",
-                    pending: "localhost:5173/pago-pendiente"
+                    success: `${FRONTEND_URL}/pago-exitoso`,
+                    failure: `${FRONTEND_URL}/pago-fallido`,
+                    pending: `${FRONTEND_URL}/pago-pendiente`
                 },
                 auto_return: "all"
             }
