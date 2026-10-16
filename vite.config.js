@@ -6,5 +6,5 @@ export default defineConfig({
   root:"./frontend",
   plugins: [react()],
   envDir: "../",
-  publicDir: 'frontend/public'
+  publicDir: 'public'
 })

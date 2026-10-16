@@ -96,7 +96,9 @@ export const crearPreferencia = async (req, res) => {
                     failure: `${FRONTEND_URL}/pago-fallido`,
                     pending: `${FRONTEND_URL}/pago-pendiente`
                 },
-                auto_return: "all"
+                // Mercado Pago solo acepta auto_return con URLs https (producción).
+                // En local se omite y el usuario vuelve con el botón "Volver al sitio".
+                ...(FRONTEND_URL.startsWith("https://") && { auto_return: "approved" })
             }
         });
 
