@@ -13,7 +13,7 @@ export default function Navbar() {
     const [search, setSearch] = useState("");
     const [products, setProducts] = useState([]);
 
-    
+
     const { estaAutenticado, logout, usuario } = useAuth();
     const { cartItems, cartCount } = useCarrito();
     const navigate = useNavigate();
@@ -55,6 +55,13 @@ export default function Navbar() {
 
     return (
         <> {/* Fragmento padre: fundamental para que los paneles no se rompan con el sticky-top */}
+
+            <div className="aviso-demo" role="note">
+                <i className="bi bi-info-circle-fill"></i>
+                <span>
+                    <strong>Sitio de demostración.</strong> Proyecto de portafolio: los productos y pagos son de prueba, no se realizan compras reales.
+                </span>
+            </div>
             <nav className="navbar sticky-top border-bottom px-3 px-md-5 custom-navbar">
                 <div className="container-fluid px-0 d-flex justify-content-between align-items-center">
 

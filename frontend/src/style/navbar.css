@@ -1,4 +1,22 @@
 
+.aviso-demo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #fff4d6;
+  color: #6b4e00;
+  border-bottom: 1px solid #f0d78c;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.aviso-demo i {
+  flex-shrink: 0;
+}
+
 .navbar-search {
   padding: 10px 16px;
   border-radius: 20px;
