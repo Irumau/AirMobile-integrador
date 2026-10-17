@@ -3,13 +3,60 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
-export const transporter = nodemailer.createTransport({
+// Gmail por SMTP: funciona en local, pero Render (plan gratis) bloquea SMTP.
+const gmailTransporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
         user: process.env.MAILER_EMAIL,
         pass: process.env.MAILER_PASS
     }
 })
+
+// Brevo por API HTTP: funciona en Render. Se usa si existe BREVO_API_KEY.
+const enviarConBrevo = async (mailOptions) => {
+    // Extrae el nombre visible de un "from" tipo: "AirMobile Tienda" <correo@gmail.com>
+    const nombreRemitente = (mailOptions.from || "")
+        .replace(/<.*>/, "").replace(/"/g, "").trim() || "AirMobile";
+
+    const destinatarios = (Array.isArray(mailOptions.to) ? mailOptions.to : String(mailOptions.to).split(","))
+        .map(email => ({ email: email.trim() }));
+
+    const body = {
+        // Brevo solo permite enviar desde un remitente verificado,
+        // por eso el email siempre es MAILER_EMAIL (se mantiene el nombre visible).
+        sender: { name: nombreRemitente, email: process.env.MAILER_EMAIL },
+        to: destinatarios,
+        subject: mailOptions.subject,
+        ...(mailOptions.html
+            ? { htmlContent: mailOptions.html }
+            : { textContent: mailOptions.text || "" }),
+        ...(mailOptions.replyTo && { replyTo: { email: mailOptions.replyTo } })
+    };
+
+    const respuesta = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+            "api-key": process.env.BREVO_API_KEY,
+            "content-type": "application/json",
+            "accept": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!respuesta.ok) {
+        const detalle = await respuesta.text();
+        throw new Error(`Brevo respondió ${respuesta.status}: ${detalle}`);
+    }
+    return respuesta.json();
+};
+
+// Misma interfaz que nodemailer: el resto del archivo no cambia.
+export const transporter = {
+    sendMail: (mailOptions) =>
+        process.env.BREVO_API_KEY
+            ? enviarConBrevo(mailOptions)
+            : gmailTransporter.sendMail(mailOptions)
+};
 
 export const enviarCorreoVerificacion = async (emailDestino, codigo) => {
     const mailOptions = {
