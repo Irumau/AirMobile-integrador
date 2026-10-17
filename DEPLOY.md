@@ -1,6 +1,6 @@
 # Despliegue de AirMobile (portafolio)
 
-Arquitectura: **Frontend → Vercel**, **API → Render**, **DB → Turso**, **Bot → n8n Cloud o n8n en Render**, **IA → Groq/Gemini (reemplaza Ollama local)**.
+Arquitectura: **Frontend → Vercel**, **API → Render**, **DB → Turso**, **Chat con IA → endpoint del backend + Groq** (en desarrollo se prototipó con n8n + Ollama).
 
 ## 1. Base de datos (Turso)
 1. `turso db create airmobile` y `turso db tokens create airmobile`.
@@ -18,18 +18,20 @@ Arquitectura: **Frontend → Vercel**, **API → Render**, **DB → Turso**, **B
 
 ## 3. Frontend (Vercel)
 1. Importá el repo. Root directory: raíz del repo (el `vercel.json` ya define build y salida `frontend/dist`).
-2. Variables: `VITE_API_URL=https://<tu-api>/api` y `VITE_N8N_WEBHOOK_URL=<webhook de producción de n8n>`.
+2. Variable: `VITE_API_URL=https://<tu-api>/api` (el chat usa `VITE_API_URL + /bot/chat` automáticamente).
 3. Deploy. Después volvé a Render y confirmá que `FRONTEND_URL` coincide exactamente.
 
 ## 4. Mercado Pago
 - Usá credenciales de prueba y cuentas de test comprador. Con URLs https públicas, `auto_return` y el webhook (`BACKEND_URL/api/pagos/webhook`) funcionan sin ngrok.
 
-## 5. Bot n8n
-- Ollama + qwen3:4b no corre en hostings gratuitos. En el workflow, reemplazá el nodo de chat model de Ollama por **Groq** (gratis, ej. `llama-3.1-8b-instant`) o **Google Gemini**.
-- En los nodos HTTP Request de las tools, cambiá `http://localhost:3000` por la URL de Render.
-- En `system_promt_email_bot.txt`, cambiá `http://localhost:5173` por la URL de Vercel.
-- Activá el workflow y usá la **Production URL** del webhook (no la de test). Configurá CORS del webhook para permitir tu dominio de Vercel.
-- Opciones de hosting: n8n Cloud (trial) o n8n en Render con imagen Docker `n8nio/n8n` (el plan gratis pierde datos al reiniciar; exportá el workflow JSON al repo).
+## 5. Chat con IA (Groq)
+- El chat de la web llama a `POST /api/bot/chat` del backend, que usa Groq con dos herramientas
+  (`consultar_catalogo` y `buscar_producto`) sobre la base de datos real. Código: `backend/src/utils/botIA.js`
+  y `chatConIA` en `backend/src/controllers/controllerChatBot.js`.
+- Creá una API key gratis en https://console.groq.com y cargala en Render como `GROQ_API_KEY`.
+- Opcional: `GROQ_MODEL` para cambiar de modelo (por defecto `openai/gpt-oss-120b`).
+- La memoria de conversación vive en RAM: se reinicia cuando Render duerme el servicio.
+- Los workflows originales de n8n (chat y bot de emails) se pueden guardar exportados en `n8n/` como referencia.
 
 ## 6. Para el portafolio
 - Creá un usuario demo y poné credenciales en el README.

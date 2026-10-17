@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { N8N_WEBHOOK_URL } from "../config";
+import { CHAT_URL } from "../config";
 
-const webhookUrl = N8N_WEBHOOK_URL;
+const webhookUrl = CHAT_URL;
 
 const getSessionData = (usuarioPerfil) => {
     if (usuarioPerfil && usuarioPerfil.id) {
@@ -35,8 +35,6 @@ export const useN8nChat = (usuarioPerfil) => {
             chatInput: userMessage,
             sessionId: sessionData.sessionId,
             nombreCliente: sessionData.nombreCliente,
-            // ✅ token solo si está logueado, null si es invitado
-            token: localStorage.getItem('token') || null,
             estaLogueado: !!(usuarioPerfil && usuarioPerfil.id)
         };
 
@@ -52,7 +50,15 @@ export const useN8nChat = (usuarioPerfil) => {
                 body: JSON.stringify(payload),
             });
 
-            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            if (!response.ok) {
+                // El backend devuelve { output } también en errores (ej: demasiados mensajes)
+                const dataError = await response.json().catch(() => null);
+                if (dataError?.output) {
+                    setMessages((prev) => [...prev, { sender: 'bot', text: dataError.output }]);
+                    return;
+                }
+                throw new Error('Error en la respuesta del servidor');
+            }
 
             const contentType = response.headers.get('content-type');
             let botResponseText = '';
