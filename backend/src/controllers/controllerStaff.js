@@ -1,4 +1,4 @@
-import ModelStaff from '../models/ModelStaff.js';
+import ModelStaff from '../models/modelStaff.js';
 import { schemaRegistroStaff, schemaActaulizarStaff, filtrosStaffSchema } from '../schemas/schemaStaff.js';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
